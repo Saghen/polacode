@@ -2,6 +2,7 @@ const vscode = require('vscode')
 const fs = require('fs')
 const path = require('path')
 const { homedir } = require('os')
+const { spawn } = require("child_process")
 
 const writeSerializedBlobToFile = (serializeBlob, fileName) => {
   const bytes = new Uint8Array(serializeBlob.split(','))
@@ -87,7 +88,24 @@ function activate(context) {
             })
 					break
 				case 'shoot-copy':
-					writeSerializedBlobToFile(data.serializedBlob, path.join(__dirname, '..', 'temp', 'temp.png'))
+					// path to temp file
+					const temp = path.join(__dirname, '..', 'temp', 'temp.png')
+
+					// store temp file, temp.png
+					writeSerializedBlobToFile( data.serializedBlob, temp )
+					
+					// powershell copy script
+					const child = spawn("powershell.exe", [path.join(__dirname, 'scripts', 'copy.ps1'), temp])
+
+					// remove temp file after copying
+					child.on("exit",  _ => fs.unlinkSync(temp))
+
+					// log errors
+					child.stderr.on("data", buffer => {
+						console.error(buffer.toString('utf8')) 
+					})
+
+					child.stdin.end()
 					break
         case 'getAndUpdateCacheAndSettings':
           panel.webview.postMessage({
