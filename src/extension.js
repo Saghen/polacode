@@ -85,7 +85,10 @@ function activate(context) {
                 lastUsedImageUri = uri
               }
             })
-          break
+					break
+				case 'shoot-copy':
+					writeSerializedBlobToFile(data.serializedBlob, path.join(__dirname, '..', 'temp', 'temp.png'))
+					break
         case 'getAndUpdateCacheAndSettings':
           panel.webview.postMessage({
             type: 'restoreBgColor',
