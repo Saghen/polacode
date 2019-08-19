@@ -97,12 +97,23 @@ function activate(context) {
 					// powershell copy script
 					const child = spawn("powershell.exe", [path.join(__dirname, 'scripts', 'copy.ps1'), temp])
 
-					// remove temp file after copying
-					child.on("exit",  _ => fs.unlinkSync(temp))
+					let err = false
 
 					// log errors
 					child.stderr.on("data", buffer => {
 						console.error(buffer.toString('utf8')) 
+						finish.reject()
+						err = true
+					})
+
+					// remove temp file after copying
+					child.on("exit",  _ => {
+						fs.unlinkSync(temp)
+						vscode.window.showInformationMessage( 
+							!err 
+								? 'Copied to clipboard!' 
+								: 'Something went wrong.'
+						)
 					})
 
 					child.stdin.end()
