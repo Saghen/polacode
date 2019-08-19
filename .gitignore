@@ -2,3 +2,8 @@ out
 node_modules
 *.vsix
 temp/*
+.DS_Store # hidden macOS file
+
+# editor configurations
+.idea
+.vscode
