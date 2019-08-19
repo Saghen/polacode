@@ -12,6 +12,7 @@
   const snippetNode = document.getElementById('snippet')
   const snippetContainerNode = document.getElementById('snippet-container')
   const obturateur = document.getElementById('save')
+  const copyButton = document.getElementById('copy')
 
   snippetContainerNode.style.opacity = '1'
   const oldState = vscode.getState();
@@ -40,9 +41,9 @@
     fileReader.readAsArrayBuffer(blob)
   }
 
-  function shoot(serializedBlob) {
+  function shoot(serializedBlob, copy = false) {
     vscode.postMessage({
-      type: 'shoot',
+      type: copy ? 'shoot-copy' : 'shoot',
       data: {
         serializedBlob
       }
@@ -133,9 +134,17 @@
     } else {
       shootSnippet()
     }
-  })
+	})
+	
+	copyButton.addEventListener('click', () => {
+    if (target === 'container') {
+      shootAll(true) // shoot and copy 
+    } else {
+      shootSnippet(true) // shoot and copy
+    }
+	})
 
-  function shootAll() {
+  function shootAll( copy = false ) {
     const width = snippetContainerNode.offsetWidth * 2
     const height = snippetContainerNode.offsetHeight * 2
     const config = {
@@ -156,12 +165,12 @@
       snippetNode.style.resize = ''
       snippetContainerNode.style.resize = ''
       serializeBlob(blob, serializedBlob => {
-        shoot(serializedBlob)
+        shoot(serializedBlob, copy)
       })
     })
   }
 
-  function shootSnippet() {
+  function shootSnippet( copy = false ) {
     const width = snippetNode.offsetWidth * 2
     const height = snippetNode.offsetHeight * 2
     const config = {
@@ -183,7 +192,7 @@
       snippetNode.style.resize = ''
       snippetContainerNode.style.resize = ''
       serializeBlob(blob, serializedBlob => {
-        shoot(serializedBlob)
+        shoot(serializedBlob, copy)
       })
     })
   }
