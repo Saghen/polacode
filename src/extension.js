@@ -102,7 +102,6 @@ function activate(context) {
 					// log errors
 					child.stderr.on("data", buffer => {
 						console.error(buffer.toString('utf8')) 
-						finish.reject()
 						err = true
 					})
 
